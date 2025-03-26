@@ -1,0 +1,95 @@
+# ResNet1D Model Configuration
+
+# Model name and version
+model_name: 'resnet1d_gru'
+version: 88
+
+# Paths
+output_dir: './models'
+train_path: '../input/hms-harmful-brain-activity-classification/train.csv'
+test_path: '../input/hms-harmful-brain-activity-classification/test.csv'
+train_eeg_path: '../input/hms-harmful-brain-activity-classification/train_eegs'
+test_eeg_path: '../input/hms-harmful-brain-activity-classification/test_eegs'
+
+# Training parameters
+seed: 2024
+batch_size: 32
+num_workers: 0
+num_folds: 5
+
+# Model parameters
+fixed_kernel_size: 5
+kernels: [3, 5, 7, 9, 11]
+linear_layer_features: 304
+
+# Signal parameters
+seq_length: 50
+sampling_rate: 200
+nsamples: 10000
+out_samples: 2000
+freq_channels: []
+filter_order: 2
+random_close_zone: 0.0
+
+# Target columns
+target_cols:
+  - "seizure_vote"
+  - "lpd_vote"
+  - "gpd_vote"
+  - "lrda_vote"
+  - "grda_vote"
+  - "other_vote"
+
+# EEG Features
+eeg_features:
+  - "Fp1"
+  - "T3"
+  - "C3"
+  - "O1"
+  - "Fp2"
+  - "C4"
+  - "T4"
+  - "O2"
+  - "F3"
+  - "P3"
+  - "F7"
+  - "T5"
+  - "F4"
+  - "P4"
+  - "F8"
+  - "T6"
+  - "EKG"
+
+# Mapping features
+map_features:
+  - ["Fp1", "T3"]
+  - ["T3", "O1"]
+  - ["Fp1", "C3"]
+  - ["C3", "O1"]
+  - ["Fp2", "C4"]
+  - ["C4", "O2"]
+  - ["Fp2", "T4"]
+  - ["T4", "O2"]
+
+# Simple features
+simple_features: []
+
+# Bandpass filter
+bandpass_filter:
+  low: 0.5
+  high: 20
+  order: 2
+
+# Random filter for augmentation
+rand_filter:
+  probab: 0.1
+  low: 10
+  high: 20
+  band: 1.0
+  order: 2
+
+# Training settings
+learning_rate: 0.001
+weight_decay: 0.0001
+max_epochs: 30
+patience: 5
