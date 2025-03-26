@@ -145,8 +145,14 @@ def main(args):
     test_df = load_test_data(args.test_path)
     
     # Load configuration for ResNet1D model
-    sys.path.append(args.weights_dir)
-    from config import CFG as ResNetConfig
+    try:
+        # First try to import from weights directory
+        sys.path.append(args.weights_dir)
+        from config import CFG as ResNetConfig
+    except ImportError:
+        # Fall back to project config
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from config.config import CFG as ResNetConfig
     
     # Prepare data for different models
     print("Generating spectrograms for EfficientNet models...")
