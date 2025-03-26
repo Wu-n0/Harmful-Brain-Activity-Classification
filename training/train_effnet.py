@@ -367,8 +367,20 @@ def main(args):
         args (argparse.Namespace): Command line arguments
     """
     # Load configuration
-    with open(args.config, 'r') as f:
-        config = yaml.safe_load(f)
+    if args.config.endswith('.yaml') or args.config.endswith('.yml'):
+        # Load YAML configuration
+        with open(args.config, 'r') as f:
+            config = yaml.safe_load(f)
+    else:
+        # Load Python configuration
+        sys.path.append(os.path.dirname(args.config))
+        config_module = __import__(os.path.basename(args.config).replace('.py', ''))
+        
+        # Check if we have EfficientNetConfig class or use CFG
+        if hasattr(config_module, 'EfficientNetConfig'):
+            config = config_module.EfficientNetConfig
+        else:
+            config = config_module.CFG
     
     # Set up environment
     set_random_seed(seed=config.get('seed', 42))
@@ -416,7 +428,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train EfficientNet models")
-    parser.add_argument("--config", type=str, required=True, help="Path to configuration YAML file")
+    parser.add_argument("--config", type=str, default="../config/config.py", 
+                       help="Path to configuration file (YAML or Python)")
     args = parser.parse_args()
     
     main(args)
