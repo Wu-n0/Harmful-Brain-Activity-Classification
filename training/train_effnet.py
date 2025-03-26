@@ -366,20 +366,28 @@ def main(args):
     Args:
         args (argparse.Namespace): Command line arguments
     """
+    # Create a configuration object
+    class Config:
+        pass
+    
+    config = Config()
+    
     # Load configuration
     if args.config.endswith('.yaml') or args.config.endswith('.yml'):
         # Load YAML configuration
         with open(args.config, 'r') as f:
-            config = yaml.safe_load(f)
+            config_dict = yaml.safe_load(f)
+            
+        # Set attributes from dictionary
+        for key, value in config_dict.items():
+            setattr(config, key, value)
     else:
         # Load Python configuration
         sys.path.append(os.path.dirname(args.config))
         config_module = __import__(os.path.basename(args.config).replace('.py', ''))
         
-        # Check if we have EfficientNetConfig class or use CFG
-        if hasattr(config_module, 'EfficientNetConfig'):
-            config = config_module.EfficientNetConfig
-        else:
+        # Use the existing Config class
+        if hasattr(config_module, 'CFG'):
             config = config_module.CFG
     
     # Set up environment
@@ -427,7 +435,7 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Train EfficientNet models")
+    parser = argparse.ArgumentParser(description="Train ResNet1D models for EEG classification")
     parser.add_argument("--config", type=str, default="../config/config.py", 
                        help="Path to configuration file (YAML or Python)")
     args = parser.parse_args()
