@@ -23,7 +23,8 @@ def generate_test_spectrograms(test_df, output_folder='images'):
     Returns:
         dict: Dictionary mapping EEG IDs to spectrograms
     """
-    from preprocessing import create_spectrogram_with_cusignal, create_spectrogram_competition
+    # Import from the same package
+    from data.preprocessing import create_spectrogram_with_cusignal, create_spectrogram_competition
     
     # Make sure output folder exists
     if not os.path.exists(output_folder):
