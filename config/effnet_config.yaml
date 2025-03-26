@@ -1,0 +1,35 @@
+# EfficientNet Model Configuration
+
+# Model name and version
+model_name: 'effnet_model'
+version: 1.0
+
+# Paths
+output_dir: './models'
+train_path: '../input/hms-harmful-brain-activity-classification/train.csv'
+train_eeg_path: '../input/hms-harmful-brain-activity-classification/train_eegs'
+train_spec_path: '../input/hms-harmful-brain-activity-classification/train_spectrograms'
+
+# Training parameters
+seed: 42
+batch_size: 32
+epochs: 4
+folds: 5
+num_workers: 0
+
+# Model parameters
+spec_size: [512, 512, 3]
+target_cols: ["seizure_vote", "lpd_vote", "gpd_vote", "lrda_vote", "grda_vote", "other_vote"]
+
+# Learning rate schedule
+initial_lr: 0.001
+min_lr: 0.00001
+
+# Data augmentation
+augmentation:
+  flip: true
+  rotate: false
+  scale: 0.1
+  shift: 0.1
+  brightness: 0.1
+  contrast: 0.1
