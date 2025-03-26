@@ -97,7 +97,3 @@ The repository supports YAML configuration files:
 python training/train_effnet.py --config config/effnet_config.yaml
 python training/train_resnet1d.py --config config/resnet1d_config.yaml
 ```
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
