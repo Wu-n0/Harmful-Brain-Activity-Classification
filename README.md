@@ -90,7 +90,10 @@ python inference/predict.py --test_path /path/to/test_data --weights_dir /path/t
 ```
 
 ### Training (Optional)
+The repository supports YAML configuration files:
+
 ```bash
+# Using the YAML configuration files
 python training/train_effnet.py --config config/effnet_config.yaml
 python training/train_resnet1d.py --config config/resnet1d_config.yaml
 ```
