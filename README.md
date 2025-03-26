@@ -1,50 +1,100 @@
-# README for Harmful Brain Activity Classification 
+# HMS Harmful Brain Activity Classification
 
-This project focuses on classifying harmful brain activity using two complementary approaches: an EfficientNet-based model and a ResNet1D-GRU model. The project leverages spectrograms generated from EEG data to train these models for distinguishing between different types of brain activity.
+![Brain EEG](https://img.shields.io/badge/EEG-Analysis-blue)
+![Deep Learning](https://img.shields.io/badge/Deep%20Learning-Classification-green)
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+![Framework](https://img.shields.io/badge/Frameworks-PyTorch%20%7C%20TensorFlow-orange)
 
-## Key Components
+## Project Overview
 
-### 1. Data Preparation
+This repository contains my solution to the [HMS Harmful Brain Activity Classification](https://www.kaggle.com/competitions/hms-harmful-brain-activity-classification) Kaggle competition. The goal was to detect and classify seizures and other types of harmful brain activity from electroencephalography (EEG) signals recorded from critically ill hospital patients.
 
-**Data Sources:**
-- `train.csv`: Metadata for training EEG recordings.
-- `train_eegs/`: Parquet files containing raw EEG data for training.
-- `test.csv`: Metadata for test EEG recordings.
-- `test_eegs/`: Parquet files containing raw EEG data for testing.
-- `test_spectrograms/`: Parquet files containing precomputed spectrograms for testing.
+### Challenge
 
-**Spectrogram Generation:**
-- **Training:** Generates spectrograms from raw EEG data using custom functions based on signal processing techniques (filtering, windowing, FFT).
-- **Testing:** Utilizes precomputed spectrograms for efficiency.
-- **Data Augmentation:** Applies label smoothing and pseudo-labeling techniques to enhance model performance.
+The competition involved classifying EEG data into six patterns:
+- Seizure (SZ)
+- Generalized Periodic Discharges (GPD)
+- Lateralized Periodic Discharges (LPD)
+- Lateralized Rhythmic Delta Activity (LRDA)
+- Generalized Rhythmic Delta Activity (GRDA)
+- Other
 
-### 2. EfficientNet Model
+The primary challenge was that even experts have difficulty classifying these patterns and often disagree on the correct labels. The task was to predict probabilities of each class that match the distribution of expert annotations.
 
-- **Architecture:** Employs EfficientNetB0, a pre-trained convolutional neural network, for image classification.
-- **Fine-tuning:** Adapts the pre-trained model to classify different types of brain activity.
-- **Loss Function:** Uses Kullback-Leibler Divergence (KLD) loss for multi-class classification.
-- **Learning Rate Scheduling:** Employs a learning rate scheduler to adjust the learning rate during training.
+## Solution Approach
 
-### 3. ResNet1D-GRU Model
+My solution used an ensemble of three different models:
 
-- **Architecture:** Combines ResNet1D blocks for feature extraction from EEG signals with GRU layers for temporal modeling.
-- **Hyperparameter Tuning:** Explores different kernel sizes and filter configurations for optimal performance.
-- **Model Ensembling:** Combines multiple ResNet1D-GRU models trained on different frequency bands for improved robustness.
+### 1. EfficientNetB0 with Custom Spectrograms
+- Used EEG data to generate custom spectrograms with advanced signal processing 
+- Implemented a label refinement strategy to improve classification quality
+- Applied data augmentation techniques for better generalization
 
-### 4. Training and Evaluation
+### 2. ResNet1D with GRU for Raw Signal Processing
+- Built a custom 1D CNN architecture with residual connections
+- Added recurrent layers (GRU) to capture temporal dependencies
+- Utilized multi-kernel approach to capture features at different scales
 
-- **Cross-Validation:** Uses stratified group K-fold cross-validation to assess model performance and prevent overfitting.
-- **Evaluation Metric:** Employs the KL divergence score, a metric commonly used in multi-class classification tasks.
+### 3. Ensemble of EfficientNet Models with Different Spectrograms
+- Combined multiple models including EfficientNetB0 and EfficientNetB1
+- Used both instance-wise and dataset-wide normalization
+- Created new spectrograms directly from EEG data for additional input features
 
-### 5. Inference and Submission
+### Ensemble Weighting
+The final solution combines predictions from all three models with weights:
+- ResNet1D_GRU: 15%
+- EfficientNetB0 with Custom Spectrograms: 50%
+- EfficientNet Ensemble: 35%
 
-- **Inference on Test Data:** Generates predictions for the test spectrograms using both models.
-- **Ensemble Prediction:** Combines the predictions of the EfficientNet and ResNet1D-GRU models using a weighted average.
-- **Submission:** Formats the final predictions into a CSV file for submission.
+## Repository Structure
 
-## Additional Notes
+```
+.
+├── README.md                 # Project documentation
+├── requirements.txt          # Dependencies
+├── config/                   # Configuration files
+├── data/                     # Data preprocessing scripts
+│   ├── preprocessing.py
+│   └── spectrograms.py
+├── models/                   # Model definitions
+│   ├── effnet.py             # EfficientNet implementation
+│   ├── resnet1d.py           # ResNet1D with GRU
+│   └── ensemble.py           # Model ensemble
+├── training/                 # Training scripts
+│   ├── train_effnet.py       # EfficientNet training
+│   └── train_resnet1d.py     # ResNet1D training
+└── inference/                # Inference and submission scripts
+    └── predict.py            # Final prediction script
+```
 
-- **Mixed Precision:** Utilizes mixed precision training to accelerate computations on GPUs.
-- **Deterministic Behavior:** Sets random seeds to ensure reproducibility of results.
+## Performance
 
-Feel free to explore and modify the code to experiment with different architectures, hyperparameters, and data preprocessing techniques to potentially improve classification performance.
+This solution achieved a competitive Kullback-Leibler divergence score in the competition, demonstrating the effectiveness of the ensemble approach in matching expert consensus on challenging EEG pattern classification tasks.
+
+## Installation
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/hms-brain-activity.git
+cd hms-brain-activity
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+## Usage
+
+### Inference
+```bash
+python inference/predict.py --test_path /path/to/test_data --weights_dir /path/to/weights
+```
+
+### Training (Optional)
+```bash
+python training/train_effnet.py --config config/effnet_config.yaml
+python training/train_resnet1d.py --config config/resnet1d_config.yaml
+```
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
